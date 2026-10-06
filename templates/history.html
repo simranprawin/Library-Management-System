@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}History | Library Management System{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <div>
+        <span class="section-label">Library Records</span>
+
+        <h1>Borrowing History</h1>
+
+        <p>
+            View borrowing and return activity.
+        </p>
+    </div>
+
+    {% if session.get("role") == "admin" %}
+
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+            ← Dashboard
+        </a>
+
+    {% else %}
+
+        <a href="{{ url_for('my_books') }}" class="btn btn-secondary">
+            ← My Books
+        </a>
+
+    {% endif %}
+
+</section>
+
+
+{% if users is defined %}
+
+<section class="section">
+
+    <div class="section-header">
+
+        <div>
+            <span class="section-label">
+                Registered Users
+            </span>
+
+            <h2>
+                Library Users
+            </h2>
+        </div>
+
+    </div>
+
+
+    {% if users %}
+
+        <div class="table-container">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for user in users %}
+
+                        <tr>
+
+                            <td>
+                                #{{ user["id"] }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ user["name"] }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ user["email"] }}
+                            </td>
+
+                            <td>
+
+                                {% if user["role"] == "admin" %}
+
+                                    <span class="status-badge status-admin">
+                                        Admin
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-student">
+                                        Student
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                👥
+            </div>
+
+            <h3>
+                No users found
+            </h3>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endif %}
+
+
+<section class="section">
+
+    <div class="section-header">
+
+        <div>
+            <span class="section-label">
+                Borrowing Records
+            </span>
+
+            <h2>
+                {% if session.get("role") == "admin" %}
+                    All Borrowing Activity
+                {% else %}
+                    My Borrowing Activity
+                {% endif %}
+            </h2>
+        </div>
+
+    </div>
+
+
+    {% if records %}
+
+        <div class="table-container">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+
+                        {% if session.get("role") == "admin" %}
+                            <th>Student</th>
+                            <th>Email</th>
+                        {% endif %}
+
+                        <th>Book</th>
+                        <th>Author</th>
+                        <th>Issue Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Status</th>
+                        <th>Fine</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for record in records %}
+
+                        <tr>
+
+                            {% if session.get("role") == "admin" %}
+
+                                <td>
+                                    {{ record["user_name"] }}
+                                </td>
+
+                                <td>
+                                    {{ record["email"] }}
+                                </td>
+
+                            {% endif %}
+
+
+                            <td>
+                                <strong>
+                                    {{ record["title"] }}
+                                </strong>
+                            </td>
+
+
+                            <td>
+                                {{ record["author"] }}
+                            </td>
+
+
+                            <td>
+                                {{ record["issue_date"] }}
+                            </td>
+
+
+                            <td>
+                                {{ record["due_date"] }}
+                            </td>
+
+
+                            <td>
+                                {{ record["return_date"] or "—" }}
+                            </td>
+
+
+                            <td>
+
+                                {% if record["status"] == "Issued" %}
+
+                                    <span class="status-badge status-issued">
+                                        Issued
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-returned">
+                                        Returned
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                ₹{{ "%.2f"|format(record["fine"] or 0) }}
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                📋
+            </div>
+
+            <h3>
+                No borrowing records
+            </h3>
+
+            <p>
+                Borrowing activity will appear here.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

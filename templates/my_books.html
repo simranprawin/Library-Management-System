@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}My Books | Library Management System{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <div>
+        <span class="section-label">My Library</span>
+
+        <h1>My Books</h1>
+
+        <p>
+            View the books you currently have and your borrowing details.
+        </p>
+    </div>
+
+    <a href="{{ url_for('books') }}" class="btn btn-primary">
+        Browse Books
+    </a>
+
+</section>
+
+
+<section class="section">
+
+    {% if records %}
+
+        <div class="table-container">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Book</th>
+                        <th>Author</th>
+                        <th>Issue Date</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Fine</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for record in records %}
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    {{ record["title"] }}
+                                </strong>
+
+                                <small class="table-subtext">
+                                    ISBN: {{ record["isbn"] }}
+                                </small>
+                            </td>
+
+
+                            <td>
+                                {{ record["author"] }}
+                            </td>
+
+
+                            <td>
+                                {{ record["issue_date"] }}
+                            </td>
+
+
+                            <td>
+                                {{ record["due_date"] }}
+                            </td>
+
+
+                            <td>
+
+                                {% if record["status"] == "Issued" %}
+
+                                    <span class="status-badge status-issued">
+                                        Issued
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-returned">
+                                        Returned
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                ₹{{ "%.2f"|format(record["fine"] or 0) }}
+                            </td>
+
+
+                            <td>
+
+                                {% if record["status"] == "Issued" %}
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for('return_book', borrowing_id=record['id']) }}"
+                                        class="inline-form"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-small btn-primary"
+                                        >
+                                            Return Book
+                                        </button>
+
+                                    </form>
+
+                                {% else %}
+
+                                    <span class="returned-text">
+                                        Returned
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                📚
+            </div>
+
+            <h3>
+                No borrowing records
+            </h3>
+
+            <p>
+                You haven't borrowed any books yet.
+            </p>
+
+            <a
+                href="{{ url_for('books') }}"
+                class="btn btn-primary"
+            >
+                Browse Books
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

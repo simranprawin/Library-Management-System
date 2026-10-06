@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | Library Management System{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-header">
+
+    <div>
+        <span class="section-label">Administration</span>
+
+        <h1>
+            Admin Dashboard
+        </h1>
+
+        <p>
+            Welcome, {{ session.get("name") }}. Manage your library from here.
+        </p>
+    </div>
+
+    <a href="{{ url_for('add_book') }}" class="btn btn-primary">
+        + Add New Book
+    </a>
+
+</section>
+
+
+<section class="stats-grid dashboard-stats">
+
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div>
+            <h3>{{ total_users }}</h3>
+            <p>Registered Students</p>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div>
+            <h3>{{ total_book_titles }}</h3>
+            <p>Book Titles</p>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">📖</div>
+        <div>
+            <h3>{{ total_books }}</h3>
+            <p>Total Copies</p>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div>
+            <h3>{{ available_books }}</h3>
+            <p>Available Copies</p>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">📤</div>
+        <div>
+            <h3>{{ issued_books }}</h3>
+            <p>Currently Issued</p>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">📥</div>
+        <div>
+            <h3>{{ returned_books }}</h3>
+            <p>Books Returned</p>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">₹</div>
+        <div>
+            <h3>₹{{ "%.2f"|format(total_fines) }}</h3>
+            <p>Total Fines</p>
+        </div>
+    </div>
+
+</section>
+
+
+<section class="dashboard-actions">
+
+    <div class="section-header">
+
+        <div>
+            <span class="section-label">
+                Quick Management
+            </span>
+
+            <h2>
+                Library Management
+            </h2>
+        </div>
+
+    </div>
+
+
+    <div class="action-grid">
+
+        <a href="{{ url_for('books') }}" class="action-card">
+
+            <span class="action-icon">📚</span>
+
+            <div>
+                <h3>Manage Books</h3>
+                <p>Add, edit, delete, and search books.</p>
+            </div>
+
+        </a>
+
+
+        <a href="{{ url_for('add_book') }}" class="action-card">
+
+            <span class="action-icon">➕</span>
+
+            <div>
+                <h3>Add Book</h3>
+                <p>Add a new book to the collection.</p>
+            </div>
+
+        </a>
+
+
+        <a href="{{ url_for('history') }}" class="action-card">
+
+            <span class="action-icon">📋</span>
+
+            <div>
+                <h3>Borrowing History</h3>
+                <p>View all borrowing and return records.</p>
+            </div>
+
+        </a>
+
+
+        <a href="{{ url_for('admin_users') }}" class="action-card">
+
+            <span class="action-icon">👥</span>
+
+            <div>
+                <h3>Users</h3>
+                <p>View registered library users.</p>
+            </div>
+
+        </a>
+
+    </div>
+
+</section>
+
+
+<section class="section">
+
+    <div class="section-header">
+
+        <div>
+            <span class="section-label">
+                Recent Activity
+            </span>
+
+            <h2>
+                Recent Borrowings
+            </h2>
+        </div>
+
+        <a href="{{ url_for('history') }}" class="view-all">
+            View History →
+        </a>
+
+    </div>
+
+
+    {% if recent_borrowings %}
+
+        <div class="table-container">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Student</th>
+                        <th>Book</th>
+                        <th>Issue Date</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Fine</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for record in recent_borrowings %}
+
+                        <tr>
+
+                            <td>
+                                {{ record["user_name"] }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ record["title"] }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ record["issue_date"] }}
+                            </td>
+
+                            <td>
+                                {{ record["due_date"] }}
+                            </td>
+
+                            <td>
+
+                                {% if record["status"] == "Issued" %}
+
+                                    <span class="status-badge status-issued">
+                                        Issued
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-returned">
+                                        Returned
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+                                ₹{{ "%.2f"|format(record["fine"] or 0) }}
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                📋
+            </div>
+
+            <h3>
+                No borrowing activity yet
+            </h3>
+
+            <p>
+                Borrowing records will appear here once students issue books.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Home | Library Management System{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <span class="hero-badge">
+            📚 Smart Library System
+        </span>
+
+        <h1>
+            Welcome to the Library
+            <span>Management System</span>
+        </h1>
+
+        <p>
+            Discover, borrow, and manage books easily with our
+            simple and efficient digital library platform.
+        </p>
+
+        <div class="hero-buttons">
+
+            <a href="{{ url_for('books') }}" class="btn btn-primary">
+                Browse Books
+            </a>
+
+            {% if not session.get('user_id') %}
+
+                <a href="{{ url_for('register') }}" class="btn btn-secondary">
+                    Create Account
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="stats-grid">
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            📚
+        </div>
+
+        <div>
+            <h3>{{ total_books }}</h3>
+            <p>Total Book Copies</p>
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            ✅
+        </div>
+
+        <div>
+            <h3>{{ available_books }}</h3>
+            <p>Available Copies</p>
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            🔎
+        </div>
+
+        <div>
+            <h3>{{ books|length }}</h3>
+            <p>Book Titles Shown</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section">
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="section-label">
+                Library Collection
+            </span>
+
+            <h2>
+                Featured Books
+            </h2>
+
+        </div>
+
+        <a href="{{ url_for('books') }}" class="view-all">
+            View All →
+        </a>
+
+    </div>
+
+
+    {% if books %}
+
+        <div class="book-grid">
+
+            {% for book in books[:6] %}
+
+                <div class="book-card">
+
+                    <div class="book-cover">
+                        📖
+                    </div>
+
+                    <div class="book-info">
+
+                        <span class="book-category">
+                            {{ book["category"] }}
+                        </span>
+
+                        <h3>
+                            {{ book["title"] }}
+                        </h3>
+
+                        <p class="book-author">
+                            By {{ book["author"] }}
+                        </p>
+
+                        <div class="book-meta">
+
+                            <span>
+                                ISBN: {{ book["isbn"] }}
+                            </span>
+
+                            {% if book["available"] > 0 %}
+
+                                <span class="available">
+                                    {{ book["available"] }} available
+                                </span>
+
+                            {% else %}
+
+                                <span class="unavailable">
+                                    Currently unavailable
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        {% if session.get('user_id') and book["available"] > 0 %}
+
+                            <a href="{{ url_for('issue_book', book_id=book['id']) }}"
+                               class="btn btn-small btn-primary">
+                                Issue Book
+                            </a>
+
+                        {% elif not session.get('user_id') %}
+
+                            <a href="{{ url_for('login') }}"
+                               class="btn btn-small btn-secondary">
+                                Login to Issue
+                            </a>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                📚
+            </div>
+
+            <h3>No books available</h3>
+
+            <p>
+                The library collection is currently empty.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<section class="features-section">
+
+    <div class="section-header centered">
+
+        <span class="section-label">
+            Why Use Our System?
+        </span>
+
+        <h2>
+            Everything You Need
+        </h2>
+
+        <p>
+            Manage your library experience quickly and efficiently.
+        </p>
+
+    </div>
+
+
+    <div class="features-grid">
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                🔍
+            </div>
+
+            <h3>
+                Easy Search
+            </h3>
+
+            <p>
+                Quickly search books by title, author, ISBN, or category.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                📖
+            </div>
+
+            <h3>
+                Easy Borrowing
+            </h3>
+
+            <p>
+                Issue available books and keep track of your borrowed items.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                📅
+            </div>
+
+            <h3>
+                Due Date Tracking
+            </h3>
+
+            <p>
+                Keep track of return dates and automatically calculate late fines.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                📊
+            </div>
+
+            <h3>
+                Smart Dashboard
+            </h3>
+
+            <p>
+                Admins can monitor books, users, borrowing activity, and fines.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

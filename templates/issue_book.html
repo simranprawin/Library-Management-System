@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Issue Book | Library Management System{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <div>
+        <span class="section-label">Borrow Book</span>
+
+        <h1>Issue Book</h1>
+
+        <p>
+            Review the book details before borrowing it.
+        </p>
+    </div>
+
+    <a href="{{ url_for('books') }}" class="btn btn-secondary">
+        ← Back to Books
+    </a>
+
+</section>
+
+
+<section class="issue-section">
+
+    <div class="issue-card">
+
+        <div class="issue-book-icon">
+            📖
+        </div>
+
+        <div class="issue-book-content">
+
+            <span class="book-category">
+                {{ book["category"] }}
+            </span>
+
+            <h2>
+                {{ book["title"] }}
+            </h2>
+
+            <p class="book-author">
+                By {{ book["author"] }}
+            </p>
+
+
+            <div class="issue-details">
+
+                <div>
+                    <span>ISBN</span>
+                    <strong>{{ book["isbn"] }}</strong>
+                </div>
+
+                <div>
+                    <span>Available Copies</span>
+                    <strong>{{ book["available"] }}</strong>
+                </div>
+
+                <div>
+                    <span>Borrow Period</span>
+                    <strong>14 Days</strong>
+                </div>
+
+                <div>
+                    <span>Late Fine</span>
+                    <strong>₹5 per day</strong>
+                </div>
+
+            </div>
+
+
+            <div class="issue-notice">
+
+                <span class="notice-icon">
+                    ℹ️
+                </span>
+
+                <p>
+                    The book will be issued to your account for 14 days.
+                    Please return it before the due date to avoid a late fine.
+                </p>
+
+            </div>
+
+
+            <form method="POST" class="issue-form">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary btn-full"
+                >
+                    Confirm & Issue Book
+                </button>
+
+                <a
+                    href="{{ url_for('books') }}"
+                    class="btn btn-secondary btn-full"
+                >
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

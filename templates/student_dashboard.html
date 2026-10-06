@@ -1,0 +1,468 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard | Library Management System{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-header">
+
+    <div>
+        <span class="section-label">Student Portal</span>
+
+        <h1>
+            Welcome, {{ session.get("name") }}
+        </h1>
+
+        <p>
+            Manage your borrowed books and library activity.
+        </p>
+    </div>
+
+    <a href="{{ url_for('books') }}" class="btn btn-primary">
+        Browse Books
+    </a>
+
+</section>
+
+
+<!-- DASHBOARD STATISTICS -->
+
+<section class="stats-grid">
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            📖
+        </div>
+
+        <div>
+            <h3>{{ issued_books|length }}</h3>
+            <p>Currently Borrowed</p>
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            📋
+        </div>
+
+        <div>
+            <h3>{{ history|length }}</h3>
+            <p>Total Borrowing Records</p>
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            📚
+        </div>
+
+        <div>
+            <h3>14</h3>
+            <p>Borrow Period (Days)</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CURRENTLY BORROWED BOOKS -->
+
+<section class="section">
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="section-label">
+                Active Borrowings
+            </span>
+
+            <h2>
+                Books You Have
+            </h2>
+
+        </div>
+
+        <a href="{{ url_for('my_books') }}" class="view-all">
+            View All →
+        </a>
+
+    </div>
+
+
+    {% if issued_books %}
+
+        <div class="table-container">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Book</th>
+
+                        <th>Author</th>
+
+                        <th>Issue Date</th>
+
+                        <th>Due Date</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for record in issued_books %}
+
+                        <tr>
+
+                            <td>
+
+                                <strong>
+                                    {{ record["title"] }}
+                                </strong>
+
+                                <small class="table-subtext">
+                                    ISBN: {{ record["isbn"] }}
+                                </small>
+
+                            </td>
+
+
+                            <td>
+                                {{ record["author"] }}
+                            </td>
+
+
+                            <td>
+                                {{ record["issue_date"] }}
+                            </td>
+
+
+                            <td>
+                                {{ record["due_date"] }}
+                            </td>
+
+
+                            <td>
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('return_book', borrowing_id=record['id']) }}"
+                                    class="inline-form"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-small btn-primary"
+                                    >
+                                        Return Book
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                📚
+            </div>
+
+            <h3>
+                No books currently borrowed
+            </h3>
+
+            <p>
+                Browse the library and find your next book.
+            </p>
+
+            <a
+                href="{{ url_for('books') }}"
+                class="btn btn-primary"
+            >
+                Browse Books
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<!-- BORROWING HISTORY -->
+
+<section class="section">
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="section-label">
+                Recent Activity
+            </span>
+
+            <h2>
+                Borrowing History
+            </h2>
+
+        </div>
+
+        <a href="{{ url_for('history') }}" class="view-all">
+            Full History →
+        </a>
+
+    </div>
+
+
+    {% if history %}
+
+        <div class="table-container">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Book</th>
+
+                        <th>Issue Date</th>
+
+                        <th>Due Date</th>
+
+                        <th>Return Date</th>
+
+                        <th>Status</th>
+
+                        <th>Fine</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for record in history[:8] %}
+
+                        <tr>
+
+                            <td>
+
+                                <strong>
+                                    {{ record["title"] }}
+                                </strong>
+
+                                <small class="table-subtext">
+                                    {{ record["author"] }}
+                                </small>
+
+                            </td>
+
+
+                            <td>
+                                {{ record["issue_date"] }}
+                            </td>
+
+
+                            <td>
+                                {{ record["due_date"] }}
+                            </td>
+
+
+                            <td>
+                                {{ record["return_date"] or "—" }}
+                            </td>
+
+
+                            <td>
+
+                                {% if record["status"] == "Issued" %}
+
+                                    <span class="status-badge status-issued">
+                                        Issued
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-returned">
+                                        Returned
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                ₹{{ "%.2f"|format(record["fine"] or 0) }}
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                📋
+            </div>
+
+            <h3>
+                No borrowing history
+            </h3>
+
+            <p>
+                Your borrowing activity will appear here.
+            </p>
+
+            <a
+                href="{{ url_for('books') }}"
+                class="btn btn-primary"
+            >
+                Browse Books
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<!-- QUICK ACTIONS -->
+
+<section class="section">
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="section-label">
+                Quick Actions
+            </span>
+
+            <h2>
+                Library Shortcuts
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="action-grid">
+
+        <a
+            href="{{ url_for('books') }}"
+            class="action-card"
+        >
+
+            <span class="action-icon">
+                🔎
+            </span>
+
+            <div>
+
+                <h3>
+                    Find a Book
+                </h3>
+
+                <p>
+                    Search the library collection.
+                </p>
+
+            </div>
+
+        </a>
+
+
+        <a
+            href="{{ url_for('my_books') }}"
+            class="action-card"
+        >
+
+            <span class="action-icon">
+                📚
+            </span>
+
+            <div>
+
+                <h3>
+                    My Books
+                </h3>
+
+                <p>
+                    View all your borrowed books.
+                </p>
+
+            </div>
+
+        </a>
+
+
+        <a
+            href="{{ url_for('history') }}"
+            class="action-card"
+        >
+
+            <span class="action-icon">
+                📋
+            </span>
+
+            <div>
+
+                <h3>
+                    History
+                </h3>
+
+                <p>
+                    View your complete borrowing history.
+                </p>
+
+            </div>
+
+        </a>
+
+    </div>
+
+</section>
+
+{% endblock %}
